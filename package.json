@@ -1,0 +1,67 @@
+{
+  "name": "dsh-plugin-guard",
+  "version": "0.1.0",
+  "description": "Read-only, offline-first security scanner plugin for DeepSeek Harness plugins.",
+  "keywords": [
+    "deepseek",
+    "harness",
+    "dsh-plugin",
+    "security",
+    "prompt-injection",
+    "supply-chain"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MangShe3-0/dsh-plugin-guard.git"
+  },
+  "homepage": "https://github.com/MangShe3-0/dsh-plugin-guard#readme",
+  "bugs": {
+    "url": "https://github.com/MangShe3-0/dsh-plugin-guard/issues"
+  },
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./scanner": "./lib/scanner.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "dsh-plugin-guard": "./bin/dsh-plugin-guard.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "cordis.patch.yml",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check lib/scanner.js && node --check lib/index.js && node --check bin/dsh-plugin-guard.js && node --test"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-tools": "^0.1.0-rc.5"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-tools": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "dsh-plugin-guard": "file:dsh-plugin-guard-0.1.0.tgz"
+  }
+}
