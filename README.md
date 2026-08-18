@@ -18,15 +18,15 @@ DeepSeek Harness 插件的安装前安全检查插件。默认离线、只读，
 
 ## 安装到 DeepSeek Harness
 
-在本目录生成 tarball，再加入一个单独的 Harness profile：
+在本目录生成 tarball，再安装到**实际启动 Web UI 的同一个 profile**。官方默认 Web UI 通常使用 `web` profile：
 
 ```bash
 npm pack
-dsh plugin --profile security add ./dsh-plugin-guard-0.1.0.tgz
-dsh --profile security --dump-config
+dsh plugin --profile web add ./dsh-plugin-guard-0.1.1.tgz
+dsh --profile web --dump-config
 ```
 
-配置中应出现 `id: plugin-guard`。随后启动该 profile，模型会获得 `plugin_guard_scan` 工具。
+配置中应出现 `id: plugin-guard`。然后停止并重新运行 `dsh web`，再新建对话；新会话会获得 `plugin_guard_scan` 工具。自定义 profile 用户必须把上述 `web` 替换成自己实际运行的 profile。DSH profile 彼此隔离，把插件装进 `security` 不会自动让 `web` profile 使用它。
 
 Harness 仍处于 developer preview；本项目按 2026-08-18 可见的 `@deepseek-ai/dsh` RC 插件格式实现。升级 Harness 后应重新运行测试并核对 `dsh.bundle.patch`、Loader 和 `defineTool` 接口。
 
@@ -38,13 +38,13 @@ Harness 仍处于 developer preview；本项目按 2026-08-18 可见的 `@deepse
 使用 plugin_guard_scan 扫描 ./untrusted-plugin，先不要安装或运行它。
 ```
 
-工具默认只允许扫描 Harness 当前工作目录。需要增加只读扫描根目录时，由用户在启动 Harness 前设置：
+工具默认只允许扫描当前 DSH 会话中经过验证的 `session.header.cwd`，不会使用 DSH 服务进程的启动目录。相对路径从该会话 workspace 解析；没有有效 workspace 时工具会拒绝扫描。需要增加额外的只读扫描根目录时，由用户在启动 Harness 前显式设置：
 
 ```bash
 export DSH_PLUGIN_GUARD_ROOTS="/absolute/review/inbox:/another/allowed/root"
 ```
 
-这个限制用于防止模型把扫描器当成任意文件读取工具。
+这些目录只会扩展当前会话 workspace，不会启用 `process.cwd()` 兜底。这个限制用于防止模型把扫描器当成任意文件读取工具。
 
 ## 独立命令行
 
@@ -64,7 +64,7 @@ npm test
 npm run check
 ```
 
-测试覆盖：干净插件、提示词注入与命令执行组合、凭据外传链、安装脚本、未锁定依赖、扫描根目录边界。
+测试覆盖：干净插件、提示词注入与命令执行组合、凭据外传链、安装脚本、未锁定依赖、会话 workspace 解析、缺失 workspace 时失败、额外根目录和符号链接边界。
 
 ## 安全设计
 
@@ -73,7 +73,7 @@ npm run check
 - 单文件、总字节数、文件数和 finding 数都有硬上限。
 - 二进制文件不解析；被截断或预算耗尽时 `scanComplete=false`，结论至少为 `CAUTION`。
 - 扫描证据限制长度，避免把大段恶意提示词重新注入模型上下文。
-- 插件工具限制允许扫描的根目录；CLI 仅扫描用户明确给出的路径。
+- 插件工具只隐式信任 DSH 验证过的会话 workspace；CLI 仅扫描用户明确给出的路径。
 
 ## 参考方法
 

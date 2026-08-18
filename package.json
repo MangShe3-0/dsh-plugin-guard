@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-guard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Read-only, offline-first security scanner plugin for DeepSeek Harness plugins.",
   "keywords": [
     "deepseek",
@@ -60,8 +60,5 @@
     "@deepseek-ai/dsh-tools": {
       "optional": true
     }
-  },
-  "dependencies": {
-    "dsh-plugin-guard": "file:dsh-plugin-guard-0.1.0.tgz"
   }
 }
